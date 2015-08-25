@@ -80,6 +80,16 @@ router.put('/posts/:post/upvote', auth, function(req, res, next) {
     });
 });
 
+router.put('/posts/:post/downvote', auth, function(req, res, next) {
+    req.post.downvote(function(err, post) {
+        if (err) {
+            return next(err);
+        }
+
+        res.json(post);
+    });
+});
+
 router.post('/posts/:post/comments', auth, function(req, res, next) {
     var comment = new Comment(req.body);
     comment.post = req.post;
@@ -127,30 +137,6 @@ router.put('/posts/:post/comments/:comment/upvote', auth, function(req, res, nex
     });
 });
 
-router.post('/register', function(req, res, next) {
-    if (!req.body.username || !req.body.password) {
-        return res.status(400).json({
-            message: 'Please fill out all fields'
-        });
-    }
-
-    var user = new User();
-
-    user.username = req.body.username;
-
-    user.setPassword(req.body.password)
-
-    user.save(function(err) {
-        if (err) {
-            return next(err);
-        }
-
-        return res.json({
-            token: user.generateJWT()
-        })
-    });
-});
-
 router.post('/login', function(req, res, next) {
     if (!req.body.username || !req.body.password) {
         return res.status(400).json({
@@ -158,7 +144,28 @@ router.post('/login', function(req, res, next) {
         });
     }
 
-    passport.authenticate('local', function(err, user, info) {
+    passport.authenticate('local-login', function(err, user, info) {
+        if (err) {
+            return next(err);
+        }
+
+        if (user) {
+            return res.json({
+                token: user.generateJWT()
+            });
+        } else {
+            return res.status(401).json(info);
+        }
+    })(req, res, next);
+});
+
+router.post('/register', function(req, res, next) {
+    if (!req.body.username || !req.body.password) {
+        return res.status(400).json({
+            message: 'Please fill out all fields'
+        });
+    }
+    passport.authenticate('local-signup', function(err, user, info) {
         if (err) {
             return next(err);
         }

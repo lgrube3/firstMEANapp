@@ -7,7 +7,8 @@
     <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
     <script src="/javascripts/angularApp.js"></script>
     <style>
-    .glyphicon-thumbs-up {
+    .glyphicon-thumbs-up,
+    .glyphicon-thumbs-down {
         cursor: pointer
     }
     </style>
@@ -32,7 +33,7 @@
             <h1>Reddit Clone - First MEAN app by <a href="https://github.com/lgrube3">Lucas Gruber</a></h1>
         </div>
         <div ng-repeat="post in posts | orderBy:'-upvotes'">
-            <span class="glyphicon glyphicon-thumbs-up" ng-click="incrementUpvotes(post)"></span> {{post.upvotes}}
+            <span class="glyphicon glyphicon-thumbs-up" ng-click="incrementUpvotes(post)"></span><span class="glyphicon glyphicon-thumbs-down" ng-click="incrementDownvotes(post)"></span> {{post.upvotes}}
             <span style="font-size:20px; margin-left:10px;">
           <a ng-show="post.link" href="{{post.link}}">
             {{post.title}}

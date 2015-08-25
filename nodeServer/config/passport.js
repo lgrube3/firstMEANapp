@@ -3,7 +3,7 @@ var LocalStrategy = require('passport-local').Strategy;
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
 
-passport.use(new LocalStrategy(
+passport.use('local-login', new LocalStrategy(
     function(username, password, done) {
         User.findOne({
             username: username
@@ -22,6 +22,36 @@ passport.use(new LocalStrategy(
                 });
             }
             return done(null, user);
+        });
+    }
+));
+
+passport.use('local-signup', new LocalStrategy(
+    function(username, password, done) {
+        User.findOne({
+            username: username
+        }, function(err, user) {
+            if (err) {
+                return done(err);
+            }
+            if (user) {
+                return done(null, false, {
+                    message: 'username already taken'
+                });
+            } else {
+                var user = new User();
+
+                user.username = username;
+
+                user.setPassword(password)
+
+                user.save(function(err) {
+                    if (err) {
+                        return next(err);
+                    }
+                    return done(null, user);
+                });
+            }
         });
     }
 ));
